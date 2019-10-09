@@ -20,8 +20,6 @@ class MainController extends AbstractController
        // $this->forecast_api();
         $dailyForecasts = $this->getDoctrine()->getRepository(DailyForecasts::class)->findAll();
         $headlines = $this->getDoctrine()->getRepository(Headlines::class)->findAll();
-        dump($headlines);
-
         return $this->render('main/index.html.twig',  array('dailyForecasts' => $dailyForecasts, 'headlines' => $headlines));
     }
     /**
