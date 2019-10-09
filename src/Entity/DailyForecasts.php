@@ -17,7 +17,7 @@ class DailyForecasts
     private $id;
 
     /**
-     * @ORM\Column(type="date", length=255)
+     * @ORM\Column(type="date")
      */
     private $date;
 
@@ -56,12 +56,12 @@ class DailyForecasts
         return $this->id;
     }
 
-    public function getDate(): ?string
+    public function getDate(): ?\DateTimeInterface
     {
         return $this->date;
     }
 
-    public function setDate(string $date): self
+    public function setDate(?\DateTimeInterface $date): self
     {
         $this->date = $date;
 

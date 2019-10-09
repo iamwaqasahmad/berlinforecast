@@ -1,20 +1,73 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello MainController!{% endblock %}
+{% block title %}Berlin Forecast{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    {% if headlines %}
+        {% for headline in headlines %}
+            <a href=" {{ headline.Link }}" target="_blank"> <h2> {{ headline.text }} </h2></a>
+        {% endfor %}
+    {% endif %}
+    {% if dailyForecasts %}
+        <table id="articles" class="table table-striped">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Temperature</th>
+                <th>Day</th>
+                <th>Night</th>
+                <th>Sources</th>
+                <th>Website Link</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for dailyForecast in dailyForecasts %}
+                <tr>
+                    <td>{{ dailyForecast.Date|date('Y-m-d') }}</td>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+                    <td>{% set tempratures = json_decode(dailyForecast.Temperature) %}
+                        <b>Minimum: </b> {{ tempratures['Minimum']['Value'] }}{{ tempratures['Minimum']['Unit'] }}<br>
+                        <b>Maximum: </b> {{ tempratures['Maximum']['Value'] }}{{ tempratures['Maximum']['Unit'] }}
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ 'C:/Ampps/www/berlinforecast/src/Controller/MainController.php'|file_link(0) }}">src/Controller/MainController.php</a></code></li>
-        <li>Your template at <code><a href="{{ 'C:/Ampps/www/berlinforecast/templates/main/index.html.twig'|file_link(0) }}">templates/main/index.html.twig</a></code></li>
-    </ul>
-</div>
+                    </td>
+                    <td>
+                        {% set Day = json_decode(dailyForecast.Day) %}
+
+                        <img src="https://apidev.accuweather.com/developers/Media/Default/WeatherIcons/{{  Day['Icon'] }}-s.png"><br>
+                        <b>{{  Day['IconPhrase'] }}</b><br>
+                        {% if  Day['HasPrecipitation'] == true %}
+                            Precipitation: {{ Day['PrecipitationType'] }} <br>
+                            Precipitation Intensity {{ Day['PrecipitationIntensity'] }}
+                        {% endif %}
+
+
+
+                    </td>
+                    <td>
+                        {% set Night = json_decode(dailyForecast.Night) %}
+
+                        <img src="https://apidev.accuweather.com/developers/Media/Default/WeatherIcons/{{  Night['Icon'] }}-s.png"><br>
+                        <b>{{  Night['IconPhrase'] }}</b><br>
+                        {% if Night['HasPrecipitation'] == true %}
+                            Precipitation: {{ Night['PrecipitationType'] }} <br>
+                            Precipitation Intensity {{ Night['PrecipitationIntensity'] }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% set Sources = json_decode(dailyForecast.Sources) %}
+                        <ul>
+                            {% for Source in Sources %}
+                                <li>{{ Source }}</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                    <td><a href="{{ dailyForecast.Link }}" target="_blank">Link to Desktop</a> </td>
+
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No Forecast Added Yet. (Refresh the databaset to add some from the API</p>
+    {% endif %}
 {% endblock %}
