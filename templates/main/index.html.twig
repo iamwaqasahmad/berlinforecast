@@ -5,7 +5,7 @@
 {% block body %}
     {% if headlines %}
         {% for headline in headlines %}
-            <a href=" {{ headline.Link }}" target="_blank"> <h2> {{ headline.text }} </h2></a>
+            <a href=" {{ headline.Link }}" target="_blank"><h2> {{ headline.text }} </h2></a>
         {% endfor %}
     {% endif %}
     {% if dailyForecasts %}
@@ -16,7 +16,6 @@
                 <th>Temperature</th>
                 <th>Day</th>
                 <th>Night</th>
-                <th>Sources</th>
                 <th>Website Link</th>
             </tr>
             </thead>
@@ -33,21 +32,20 @@
                     <td>
                         {% set Day = json_decode(dailyForecast.Day) %}
 
-                        <img src="https://apidev.accuweather.com/developers/Media/Default/WeatherIcons/{{  Day['Icon'] }}-s.png"><br>
-                        <b>{{  Day['IconPhrase'] }}</b><br>
+                        <img src="https://apidev.accuweather.com/developers/Media/Default/WeatherIcons/{{ Day['Icon'] }}-s.png"><br>
+                        <b>{{ Day['IconPhrase'] }}</b><br>
                         {% if  Day['HasPrecipitation'] == true %}
                             Precipitation: {{ Day['PrecipitationType'] }} <br>
                             Precipitation Intensity {{ Day['PrecipitationIntensity'] }}
                         {% endif %}
 
 
-
                     </td>
                     <td>
                         {% set Night = json_decode(dailyForecast.Night) %}
 
-                        <img src="https://apidev.accuweather.com/developers/Media/Default/WeatherIcons/{{  Night['Icon'] }}-s.png"><br>
-                        <b>{{  Night['IconPhrase'] }}</b><br>
+                        <img src="https://apidev.accuweather.com/developers/Media/Default/WeatherIcons/{{ Night['Icon'] }}-s.png"><br>
+                        <b>{{ Night['IconPhrase'] }}</b><br>
                         {% if Night['HasPrecipitation'] == true %}
                             Precipitation: {{ Night['PrecipitationType'] }} <br>
                             Precipitation Intensity {{ Night['PrecipitationIntensity'] }}
@@ -61,7 +59,7 @@
                             {% endfor %}
                         </ul>
                     </td>
-                    <td><a href="{{ dailyForecast.Link }}" target="_blank">Link to Desktop</a> </td>
+                    <td><a href="{{ dailyForecast.Link }}" target="_blank">Link to Desktop</a></td>
 
                 </tr>
             {% endfor %}

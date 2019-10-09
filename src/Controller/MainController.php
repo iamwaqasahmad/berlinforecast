@@ -17,7 +17,6 @@ class MainController extends AbstractController
      */
     public function index()
     {
-       // $this->forecast_api();
         $dailyForecasts = $this->getDoctrine()->getRepository(DailyForecasts::class)->findAll();
         $headlines = $this->getDoctrine()->getRepository(Headlines::class)->findAll();
         return $this->render('main/index.html.twig',  array('dailyForecasts' => $dailyForecasts, 'headlines' => $headlines));
@@ -28,20 +27,24 @@ class MainController extends AbstractController
     public function refresh()
     {
 
-        $this->truncateTables(array('daily_forecasts', 'Headlines'));
-        $this->forecast_api();
+        $this->_truncateTables(array('daily_forecasts', 'Headlines'));
+        $this->_forecast_api();
         return $this->redirectToRoute('main');
 
 
     }
 
-    private function forecast_api(){
+    private function _forecast_api(){
         $client = HttpClient::create();
         $response = $client->request('GET', $_ENV['API_URL'].'/'.$_ENV['API_DAYS'].'/'.$_ENV['LOCATION_KEY'].'?apikey='.$_ENV['API_KEY']);
-        $statusCode = $response->getStatusCode();
+        if (200 !== $response->getStatusCode()) {
+            throw new \Exception('An error occured while connecting to the API. Please, Try again Later.');
+        }
         $content = $response->toArray();
         $this->_add_headlines_to_database($content['Headline']);
         $this->_add_forecastdata_to_database($content['DailyForecasts']);
+
+
     }
     private function _add_headlines_to_database($headlines){
 
@@ -68,7 +71,7 @@ class MainController extends AbstractController
             $dailyForecast->setTemperature(json_encode($forecast['Temperature']));
             $dailyForecast->setDay(json_encode($forecast['Day']));
             $dailyForecast->setNight(json_encode($forecast['Night']));
-            $dailyForecast->setSources($this->json($forecast['Sources']));
+            $dailyForecast->setSources(json_encode($forecast['Sources']));
             $dailyForecast->setMobileLink($forecast['MobileLink']);
             $dailyForecast->setLink($forecast['Link']);
             $entityManager->persist($dailyForecast);
@@ -77,7 +80,7 @@ class MainController extends AbstractController
         $entityManager->flush();
     }
 
-    public function truncateTables($tableNames = array(), $cascade = false) {
+    private function _truncateTables($tableNames = array(), $cascade = false) {
         $entityManager = $this->getDoctrine()->getManager();
         $connection = $entityManager->getConnection();
         $platform = $connection->getDatabasePlatform();
